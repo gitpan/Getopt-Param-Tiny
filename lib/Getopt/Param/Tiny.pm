@@ -5,7 +5,7 @@ use strict;
 use Carp ();
 
 use vars qw($VERSION);
-$VERSION = 0.1;
+$VERSION = 0.2;
 
 sub new {
     my ($self, $arg_ref) = @_;
@@ -58,7 +58,7 @@ Getopt::Param::Tiny - Subset of Getopt::Param functionality with smaller memory 
 
 =head1 VERSION
 
-This document describes Getopt::Param::Tiny version 0.1
+This document describes Getopt::Param::Tiny version 0.2
 
 =head1 SYNOPSIS
 

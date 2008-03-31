@@ -1,5 +1,8 @@
 Revision history for Getopt-Param-Tiny
 
-0.0.1  Mon Mar 31 07:43:50 2008
+0.2  Mon Mar 31 07:48:50 2008
+       Fixed "leftover" version references
+    
+0.1  Mon Mar 31 07:43:50 2008
        Initial release.
 
