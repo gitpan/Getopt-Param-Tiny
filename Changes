@@ -1,5 +1,8 @@
 Revision history for Getopt-Param-Tiny
 
+0.3  Mon Mar 31 10:45:54 2008
+       removed Carp, vars, strict, and warnings to lower memory even more
+
 0.2  Mon Mar 31 07:48:50 2008
        Fixed "leftover" version references
     

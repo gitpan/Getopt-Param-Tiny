@@ -1,11 +1,6 @@
 package Getopt::Param::Tiny;
 
-use warnings;
-use strict;
-use Carp ();
-
-use vars qw($VERSION);
-$VERSION = 0.2;
+$VERSION = 0.3;
 
 sub new {
     my ($self, $arg_ref) = @_;
@@ -29,7 +24,7 @@ sub new {
             push @{ $self->{'opts'}{ $flag } }, defined $value ? $value : '--' . $flag;
         }
         else {
-            Carp::carp( sprintf('Argument %s did not match %s', $idx, $rg) ) if !$arg_ref->{'quiet'};
+            warn( sprintf('Argument %s did not match %s', $idx, $rg) ) if !$arg_ref->{'quiet'};
         }
         $idx++;
     }
@@ -58,7 +53,7 @@ Getopt::Param::Tiny - Subset of Getopt::Param functionality with smaller memory 
 
 =head1 VERSION
 
-This document describes Getopt::Param::Tiny version 0.2
+This document describes Getopt::Param::Tiny version 0.3
 
 =head1 SYNOPSIS
 
