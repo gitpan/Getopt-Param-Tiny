@@ -1,6 +1,8 @@
 package Getopt::Param::Tiny;
 
-$VERSION = 0.3;
+use strict;
+use vars qw($VERSION);
+$VERSION = 0.4;
 
 sub new {
     my ($self, $arg_ref) = @_;
@@ -53,7 +55,7 @@ Getopt::Param::Tiny - Subset of Getopt::Param functionality with smaller memory 
 
 =head1 VERSION
 
-This document describes Getopt::Param::Tiny version 0.3
+This document describes Getopt::Param::Tiny version 0.4
 
 =head1 SYNOPSIS
 
