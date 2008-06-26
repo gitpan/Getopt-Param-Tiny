@@ -2,7 +2,7 @@ package Getopt::Param::Tiny;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = 0.4;
+$VERSION = 0.5;
 
 sub new {
     my ($self, $arg_ref) = @_;
@@ -17,8 +17,10 @@ sub new {
     $self->{'opts'} = {};
     
     my $idx = 0;
+    ARG_ITEM:
     for my $arg ( @nodestruct ) {
-
+        last ARG_ITEM if $arg eq '--';
+        
         my $rg = $arg_ref->{'strict'} ? qr{^--([^-])} : qr{^--(.)};
         
         if( $arg =~ s/$rg/$1/ ) {
@@ -32,16 +34,73 @@ sub new {
     }
     
     if( $self->{'opts'}{'help'} && $arg_ref->{'help_coderef'} ) {
-         $arg_ref->{'help_coderef'}->();
+         $arg_ref->{'help_coderef'}->($self);
+    }
+
+    $self->{'help_coderef'} = $arg_ref->{'help_coderef'} || sub { die( sprintf(q{No '%s' function defined}, 'help') ) };
+    
+    if ( !keys %{$self->{'opts'}} && $arg_ref->{'no_args_help'} ) {
+        $self->{'help_coderef'}->($self);
     }
     
+    if( ref $arg_ref->{'known_only'} eq 'ARRAY') {
+        my %lookup;
+        @lookup{ @{$arg_ref->{'known_only'}} } = ();
+        
+        my $unknown = 0;
+        for my $k (keys %{$self->{'opts'}}) {
+            if (!exists $lookup{$k}) {
+                $unknown++;
+                # $k =~ s{\W}{?}g; # or quotemeta()
+                warn( sprintf(q{Unknown argument '%s'}, quotemeta($k)) );
+            }
+        }
+        $self->{'help_coderef'}->($self) if $unknown;
+    }
+    
+    if( ref $arg_ref->{'required'} eq 'ARRAY') {
+        
+        my $missing = 0;
+        for my $k (@{$arg_ref->{'required'}}) {
+            if (!exists $self->{'opts'}->{$k}) {
+                $missing++;
+                # $k =~ s{\W}{?}g; # or quotemeta()
+                warn( sprintf(q{Missing argument '%s'}, quotemeta($k)) );
+            }
+        }
+        $self->{'help_coderef'}->($self) if $missing;
+    }
+    
+    if( ref $arg_ref->{'validate'} eq 'CODE') {
+        $arg_ref->{'validate'}->($self) || $self->{'help_coderef'}->($self);
+    }
+    
+    if ( ref $arg_ref->{'actions'} eq 'ARRAY' ) {
+        for my $k ($arg_ref->{'actions'}) {
+            if (exists $self->{'opts'}{$k->[0]}) {
+                if (ref $k->[1] eq 'CODE') {
+                    $k->[1]->($self);
+                }
+                else {
+                    $self->{'help_coderef'}->($self);
+                }
+            }
+        }
+    }
+        
     return $self;
+}
+
+sub help {
+    my ($prm) = @_;
+    $prm->{'help_coderef'}->($prm);
 }
 
 sub param {
     my ($self, $name, @val) = @_;
     return wantarray ? keys %{ $self->{'opts'} } : [ keys %{ $self->{'opts'} } ] if !$name;
     $self->{'opts'}{$name} = \@val if @val;
+    return if !exists $self->{'opts'}{$name}; # do not auto vivify it
     return wantarray ? @{ $self->{'opts'}{$name} } : $self->{'opts'}{$name}->[0];    
 }
 
@@ -55,7 +114,7 @@ Getopt::Param::Tiny - Subset of Getopt::Param functionality with smaller memory 
 
 =head1 VERSION
 
-This document describes Getopt::Param::Tiny version 0.4
+This document describes Getopt::Param::Tiny version 0.5
 
 =head1 SYNOPSIS
 
@@ -77,6 +136,10 @@ Same use as L<Getopt::Param>'s new.
 =head2 param()
 
 Same use as L<Getopt::Param>'s param.
+
+=head2 help()
+
+Same use as L<Getopt::Param>'s help.
 
 =head1 DIAGNOSTICS
 
